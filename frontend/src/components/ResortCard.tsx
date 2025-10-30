@@ -1,6 +1,6 @@
 import './ResortCard.css';
 
-interface Resort {
+export interface Resort {
     id: string;
     resortName: string;
     state: string;
@@ -65,6 +65,6 @@ interface Resort {
 
 export default function ResortCard( {resort}: { resort: Resort} ) {
     return (<div className="resort-card">
-        <h2>{resort.resortName}</h2>
+        <h2 id="resort-name">{resort.resortName}</h2>
     </div>)
 }
