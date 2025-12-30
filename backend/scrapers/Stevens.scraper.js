@@ -101,27 +101,51 @@ function parseFutureConditions($) {
         });
     });
 
-    console.log(forecast)
+    return forecast;
+}
+
+function parseStatus($) {
+    const status = {};
+
+    $('.terrain_summary__tab_main').each((i, el) => {
+        const block = $(el);
+
+        const type = block.attr('data-terrain-status-id');
+        if (!type) return;
+
+        const circle = block.find('.terrain_summary__circle');
+
+        const open = Number(circle.attr('data-open'));
+        const total = Number(circle.attr('data-total'));
+
+        status[type] = { open, total };
+    });
+    return status;
 }
 
 // main
 export async function scrapeStevens() {
-    const resortURL = "https://www.stevenspass.com/the-mountain/mountain-conditions/weather-report.aspx";
+    const resortSnowURL = "https://www.stevenspass.com/the-mountain/mountain-conditions/weather-report.aspx";
+    const resortStatusURL = "https://www.stevenspass.com/the-mountain/mountain-conditions/lift-and-terrain-status.aspx"
     const onTheSnowURL = "https://www.onthesnow.com/washington/stevens-pass-resort/weather";
 
-    const [resortHTML, onTheSnowHTML] = await Promise.all([
-        fetchHTML(resortURL),
+    const [resortSnowHTML, resortStatusHTML, onTheSnowHTML] = await Promise.all([
+        fetchHTML(resortSnowURL),
+        fetchHTML(resortStatusURL),
         fetchHTML(onTheSnowURL),
     ]);
 
-    const $resort = cheerio.load(resortHTML);
+    const $resortSnow = cheerio.load(resortSnowHTML);
+    const $resortStatus = cheerio.load(resortStatusHTML);
     const $ots = cheerio.load(onTheSnowHTML);
 
+    parseStatus($resortStatus);
 
     return {
         resort: "Stevens",
-        snowMetrics: parseSnowMetrics($resort),
-        todaysWeather: parseTodayWeather($resort),
+        snowMetrics: parseSnowMetrics($resortSnow),
+        todaysWeather: parseTodayWeather($resortSnow),
         futureWeather: parseFutureConditions($ots),
+        status: parseStatus($resortStatus),
     }
 }
