@@ -5,14 +5,6 @@ import {parseSnowMetrics} from "../parsers/epic/snowmetrics.parser.js";
 import {parseTodayWeather} from "../parsers/epic/todaysWeather.parser.js";
 import {parseStatus} from "../parsers/epic/status.parser.js";
 
-// helper
-function readNumberWithoutUnits($, el) {
-    const clean = $(el).clone();
-    clean.find("span").remove();
-    const n = Number(clean.text().trim());
-    return Number.isNaN(n) ? null : n;
-}
-
 
 function parseFutureConditions($) {
     const forecast = [];
@@ -67,8 +59,6 @@ export async function scrapeStevens() {
     const $resortSnow = cheerio.load(resortSnowHTML);
     const $resortStatus = cheerio.load(resortStatusHTML);
     const $ots = cheerio.load(onTheSnowHTML);
-
-    parseStatus($resortStatus);
 
     return {
         resort: "Stevens",
