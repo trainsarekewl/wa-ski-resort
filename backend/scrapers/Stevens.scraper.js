@@ -61,7 +61,7 @@ export async function scrapeStevens() {
     const $ots = cheerio.load(onTheSnowHTML);
 
     return {
-        resort: "Stevens",
+        resort: "Stevens Pass",
         snowMetrics: parseSnowMetrics($resortSnow),
         todaysWeather: parseTodayWeather($resortSnow),
         futureWeather: parseFutureConditions($ots),

@@ -1,26 +1,64 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from "react";
+import "./App.css";
+import ResortCard from "./components/ResortCard";
+import Header from "./components/Header";
 
-import './App.css'
+import type {Resort} from "./types/resort.ts";
 
-import ResortCard from './components/ResortCard.tsx'
-import Header from './components/Header.tsx'
+type CacheResponse = {
+    updatedAt: string | null;
+    resorts: any[];
+    errors: string[];
+};
 
-import data from './sampleFile.json'
+const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:3001";
 
 export function App() {
-    const watchlist = data.items;
+    const [cache, setCache] = useState<CacheResponse>({
+        updatedAt: null,
+        resorts: [],
+        errors: [],
+    });
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState<string | null>(null);
+
+    useEffect(() => {
+        let cancelled = false;
+
+        async function load() {
+            try {
+                setLoading(true);
+                setLoadError(null);
+
+                const res = await fetch(`${API_BASE}/api/resorts`);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+                const json = (await res.json()) as CacheResponse;
+                if (!cancelled) setCache(json);
+            } catch (e: any) {
+                if (!cancelled) setLoadError(e?.message ?? "Failed to load");
+            } finally {
+                if (!cancelled) setLoading(false);
+            }
+        }
+
+        load();
+        return () => {
+            cancelled = true;
+        };
+    }, []);
+
+    if (loading) return <div>Loading…</div>;
+    if (loadError) return <div>Error: {loadError}</div>;
 
     return (
         <div>
             <Header />
             <div id="container">
-                {watchlist.map((r) => (
-                    <ResortCard key={r.id} resort={r} />
+                {cache.resorts.map((r: Resort) => (
+                    <ResortCard key={r.resort} resort={r} />
                 ))}
             </div>
         </div>
-    )
+    );
 }
-
-
-

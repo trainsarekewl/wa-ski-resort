@@ -65,7 +65,7 @@ export async function scrapeWhistler() {
     const todaysWeather = parseTodayWeather($resortSnow);
 
     const parsed = {
-        resort: "Whistler",
+        resort: "Whistler Blackcomb",
         snowMetrics: (parseSnowMetrics($resortSnow)),
         todaysWeather: (parseTodayWeather($resortSnow)),
         futureWeather: parseFutureConditions($ots),
